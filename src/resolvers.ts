@@ -22,7 +22,7 @@ export default {
     },
   },
   Mutation: {
-    createUser: async (_, { input }) => {
+    createUser: async (_, { input }, ctx) => {
       validateEmail(input.email);
       const password = await bcrypt.hash(input.password, 5);
       try {
@@ -34,6 +34,7 @@ export default {
     updateProfile: async (_, { input }, { auth }) => {
       if (!auth) throw new AuthenticationError('Must authenticate');
       if (input.email) validateEmail(input.email);
+      if (input.password) input.password = await bcrypt.hash(input.password, 5);
 
       try {
         return await User.findByIdAndUpdate(auth.data._id, { ...input }, { new: true });
